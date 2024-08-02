@@ -35,8 +35,15 @@ int main()
         // Open the file for the first time to get its initial end position
         FILE* file = fopen(cfg.games_mp, "r");
         if (file == NULL) {
-            throw runtime_error("Error opening file");
+            throw runtime_error("Error opening games_mp.log, please make sure your path is correct and if you're on windows, replacing \\ with \\\\");
         }
+
+        json_t* start_command = json_object();
+        json_object_set_new(start_command, "command", json_string("start"));
+        json_object_set_new(start_command, "guid", json_string("0"));
+        json_object_set_new(start_command, "pid", json_string("-1"));
+        json_object_set_new(start_command, "name", json_string("server"));
+        send_message("CreateCommand", start_command, cfg.api_key);
 
         // Move to the end of the file to start watching from there
         fseek(file, 0, SEEK_END);
@@ -106,7 +113,6 @@ int main()
                 else {
                     continue;
                 }
-
             }
 
             if (newData) {
@@ -128,6 +134,12 @@ int main()
 
         fclose(file);
         cout << "CPPAdmin terminated." << endl;
+        json_t* stop_command = json_object();
+        json_object_set_new(stop_command, "command", json_string("stop"));
+        json_object_set_new(stop_command, "guid", json_string("0"));
+        json_object_set_new(stop_command, "pid", json_string("-1"));
+        json_object_set_new(stop_command, "name", json_string("server"));
+        send_message("CreateCommand", stop_command, cfg.api_key);
     }
     catch (const exception& e) {
         cerr << "Exception: " << e.what() << endl;
