@@ -134,12 +134,17 @@
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="CPPAdmin.cpp" />
+    <ClCompile Include="socket.cpp" />
     <ClCompile Include="Requests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h" />
     <ClInclude Include="CPPAdmin.h" />
     <ClInclude Include="Requests.h" />
+    <ClInclude Include="socket.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="server.proto" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

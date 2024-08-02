@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package server;
+
+service Server {
+  rpc CreateCommand (CreateCommandRequest) returns (CreateCommandResponse) {}
+}
+
+message CreateCommandRequest {
+  string command = 1;
+  string PlayerGuid = 2;
+  string PlayerId = 3;
+  string PlayerName = 4;
+  string Message = 5;
+}
+
+message CreateCommandResponse {
+  bool success = 1;
+}

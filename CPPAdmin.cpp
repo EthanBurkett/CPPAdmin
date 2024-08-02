@@ -7,18 +7,10 @@
 #include <unordered_map>
 #include <windows.h>  // For GetAsyncKeyState and Sleep
 #include <csignal>    // For signal handling
+#include <CPPAdmin.h>
+#include <socket.h>
 
 using namespace std;
-
-// create a map that maps command to their string, for example: SAY = "say;"
-enum Commands {
-	SAY,
-	JOIN
-};
-unordered_map<string, int> commands = {
-	{"say;", SAY},
-	{"JOIN", JOIN}
-};
 
 volatile bool stopFlag = false;
 
@@ -70,9 +62,51 @@ int main()
 
                 char* line = buffer;
                 char* token = strtok(line, " ");
-                char* command = strtok(NULL, "\n");
+                if (token == nullptr) {
+					continue;
+				}
+                char* full_command = strtok(NULL, "\n");
+                if (full_command == nullptr) {
+                    continue;
+                } 
+                if (full_command == nullptr) {
+                    continue; 
+                }
+                if (strchr(full_command, ';') == nullptr) {
+					continue;
+				}
 
-                cout << "Time: " << time << " Command: " << command << endl;
+                string chat_command, player_guid, player_id, player_name, message;
+
+                chat_command = strtok(full_command, ";");
+                player_guid = strtok(NULL, ";");
+                player_id = strtok(NULL, ";");
+                player_name = strtok(NULL, ";");
+
+                if (commands.find(chat_command) != commands.end()) {
+                    if (commands[chat_command] == SAY || commands[chat_command] == SAYTEAM) {
+						message = strtok(NULL, ";");
+					}
+					else {
+						message = "";
+					}
+
+                    json_t *data = json_object();
+
+                    json_object_set_new(data, "command", json_string(chat_command.c_str()));
+                    json_object_set_new(data, "guid", json_string(player_guid.c_str()));
+                    json_object_set_new(data, "pid", json_string(player_id.c_str()));
+                    json_object_set_new(data, "name", json_string(player_name.c_str()));
+                    if(commands[chat_command] == SAY || commands[chat_command] == SAYTEAM) {
+						json_object_set_new(data, "message", json_string(message.c_str()));
+					}
+
+                    send_message("CreateCommand", data, cfg.api_key);
+                }
+                else {
+                    continue;
+                }
+
             }
 
             if (newData) {
@@ -93,7 +127,7 @@ int main()
         }
 
         fclose(file);
-        cout << "Program terminated." << endl;
+        cout << "CPPAdmin terminated." << endl;
     }
     catch (const exception& e) {
         cerr << "Exception: " << e.what() << endl;
